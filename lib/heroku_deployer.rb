@@ -38,6 +38,7 @@ class HerokuDeployer
       heroku_repo: ENV["#{app}_HEROKU_REPO"],
       git_repo: ENV["#{app}_GIT_REPO"],
       ssh_key: ENV["#{app}_SSH_KEY"],
+      git_branch: ENV["#{app}_GIT_BRANCH"] || "master",
     })
   end
 
@@ -54,13 +55,13 @@ class HerokuDeployer
       wrapper.set_env
       clone unless repo_exists?
       logger.info "fetching"
-      logger.debug `cd #{local_folder} && git fetch && git reset --hard origin/master`
+      logger.debug `cd #{local_folder} && git fetch && git reset --hard origin/#{config.git_branch}`
     end
   end
 
   def clone
     logger.info "cloning"
-    logger.debug `git clone #{config.git_repo} #{local_folder}`
+    logger.debug `git clone -b #{config.git_branch} #{config.git_repo} #{local_folder}`
     logger.debug `cd #{local_folder} && git remote add heroku #{config.heroku_repo}`
   end
 
@@ -68,7 +69,7 @@ class HerokuDeployer
     GitSSHWrapper.with_wrapper(:private_key => ENV['DEPLOY_SSH_KEY']) do |wrapper|
       wrapper.set_env
       logger.info "pushing"
-      logger.debug `cd #{local_folder}; git push -f heroku master`
+      logger.debug `cd #{local_folder}; git push -f heroku #{config.git_branch}:master`
     end
   end
 end
