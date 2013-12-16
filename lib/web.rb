@@ -1,4 +1,5 @@
 require 'sinatra'
+require 'json'
 require_relative 'heroku_deployer'
 require_relative 'deploy_job'
 
@@ -18,11 +19,12 @@ class Web < Sinatra::Application
   end
 
   post '/deploy/:app_name/:secret' do |app_name, secret|
+    request_payload = JSON.parse params['payload'] 
     if secret == ENV['DEPLOY_SECRET']
       logger.info "correct secret"
       if HerokuDeployer.exists?(app_name)
         logger.info "app exists"
-        DeployJob.new.async.perform(app_name)
+        DeployJob.new.async.perform(app_name, request_payload)
       else
         logger.info "no app"
       end

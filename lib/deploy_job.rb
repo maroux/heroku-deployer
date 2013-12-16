@@ -4,7 +4,7 @@ require_relative 'heroku_deployer'
 class DeployJob
   include SuckerPunch::Job
 
-  def perform(app_name)
-    HerokuDeployer.new(app_name).deploy
+  def perform(app_name, post_payload)
+    HerokuDeployer.new(app_name, post_payload).deploy
   end
 end

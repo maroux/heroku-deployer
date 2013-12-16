@@ -5,22 +5,25 @@ require 'ostruct'
 require 'logger'
 
 class HerokuDeployer
-  attr_reader :app, :logger
+  attr_reader :app, :logger, :post_payload
 
   def self.exists?(app)
     !!(ENV["#{app}_HEROKU_REPO"] && ENV["#{app}_GIT_REPO"] && ENV["#{app}_SSH_KEY"])
   end
 
-  def initialize(app_name, logger = Logger.new(STDOUT))
+  def initialize(app_name, post_payload, logger = Logger.new(STDOUT))
     @app = app_name
+    @post_payload = post_payload
     @logger = logger
   end
 
   def deploy
     tries = 0
     begin
-      update_local_repository
-      push
+      if post_payload['ref'] == "refs/heads/#{config.git_branch}"
+          update_local_repository
+          push
+      end
     rescue
       tries += 1
       if tries <= 1
