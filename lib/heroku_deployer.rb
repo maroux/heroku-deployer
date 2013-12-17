@@ -25,7 +25,7 @@ class HerokuDeployer
       # only merge next to staging during non-code freeze time 
       if post_payload['ref'] == "refs/heads/#{config.git_next_branch}" and
           (DateTime.now().new_offset('-0800').hour < 14 or
-          DateTime.now().new_offset('-0800').hour >= 23)
+          DateTime.now().new_offset('-0800').hour >= 0)
               update_staging_env
       end
     rescue
@@ -172,6 +172,12 @@ if __FILE__ == $0
             exit 0 
         end
         HerokuDeployer.new("server_heroku").merge_to_master(options[:dry_run] || '')
+    when "update_staging_env"
+        if not HerokuDeployer.exists?("server_heroku")
+            print "no app found\n"
+            exit 0 
+        end
+        HerokuDeployer.new("server_heroku", {"ref": "refs/heads/#{config.git_next_branch}"}).deploy
     else
         puts opt_parser
     end
