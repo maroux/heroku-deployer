@@ -177,7 +177,7 @@ if __FILE__ == $0
             print "no app found\n"
             exit 0 
         end
-        HerokuDeployer.new("server_heroku", {"ref": "refs/heads/#{config.git_next_branch}"}).deploy
+        HerokuDeployer.new("server_heroku", {"ref" => "refs/heads/#{config.git_next_branch}"}).deploy
     else
         puts opt_parser
     end
