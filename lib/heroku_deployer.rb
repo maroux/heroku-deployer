@@ -44,9 +44,7 @@ class HerokuDeployer
       update_local_repository(config.git_next_branch)
       update_local_repository(config.git_staging_branch)
       merge
-      maint_on
       push
-      maint_off
   end
 
   def config
@@ -68,9 +66,6 @@ class HerokuDeployer
   def repo_exists?
     Dir.exists?(File.join(local_folder, '.git'))
   end
-
-  def maint_on
-
 
   def update_local_repository(branch)
     GitSSHWrapper.with_wrapper(:private_key => config.ssh_key) do |wrapper|
